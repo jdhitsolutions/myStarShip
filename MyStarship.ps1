@@ -1,8 +1,7 @@
-﻿#requires -version 5.0
+﻿#requires -version 5.1
 
+Return "This is a demo script file designed to be used as a walk-through."
 #demonstrate PowerShell classes in v5
-
-#This is a Non-DSC resource example.
 
 #region Enums
 
@@ -15,7 +14,7 @@ Enum ShipClass {
     Cruiser
     Destroyer
     Battlestar
-    Dreadnought    
+    Dreadnought
 }
 
 Enum ShipSpeed {
@@ -36,106 +35,97 @@ Enum Cloak {
 
 Class MyStarship {
 
-#region properties
-[ValidateNotNullorEmpty()]
-[string]$Name 
+    #region properties
+    [string]$Name
+    [Shipclass]$ShipClass
+    [ShipSpeed]$Speed
+    [ValidateRange(1, 1000)]
+    [int]$Crew = 1
+    [boolean]$Shields = $False
+    [ValidateRange(0, 20)]
+    [int]$Torpedos = 0
+    [string]$Captain = $env:USERNAME
+    [Cloak]$CloakingDevice
 
-[ValidateNotNullorEmpty()]
-[Shipclass]$ShipClass 
+    #These are hidden properties
+    hidden [string]$Transponder = [guid]::NewGuid().Guid
+    hidden [datetime]$ManufacturingDate = (Get-Date).Addyears(245)
 
-[ValidateNotNullorEmpty()]
-[ShipSpeed]$Speed 
+    #endregion
 
-[ValidateRange(1,1000)]
-[int]$Crew = 1
+    #region methods
 
-[boolean]$Shields = $False
-
-[ValidateRange(0,20)]
-[int]$Torpedos = 0
-
-[string]$Captain = $env:USERNAME
-
-[Cloak]$CloakingDevice
-
-#These are hidden properties
-hidden [string]$Transponder = [guid]::NewGuid().Guid
-hidden [datetime]$ManufacturingDate = (Get-Date).Addyears(245)
-
-#endregion
-
-#region methods
-
-#returns the new crew complement
-[int]AddCrew([int]$Number) {
-    $this.Crew+= $Number
-    return $this.Crew
-}
-
-[timespan]GetAge() {
-    $timespan = (Get-Date).Addyears(250) - $this.ManufacturingDate
-    return $timespan
-}
-
-[string]GetAge([switch]$AsString) {
-    $timespan = (Get-Date).Addyears(250) - $this.ManufacturingDate
-    return $timespan.ToString()
-}
-
-#return True or False if operation was successful
-[Boolean]RaiseShields() {
- if (-Not $this.shields) {
-    $this.shields = $True
-    #must use Return keyword
-    Return $True
- }
- else {
-    Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already up."
-    Return $False
- }
-
-} #close RaiseShields method
-
-[Boolean]LowerShields() {
- if ($this.shields) {
-    $this.shields = $False
-    Return $True
- }
- else {
-    Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already down."
-    Return $False
- }
-
-} #close RaiseShields method
-
-[void]OpenCommunication () {
-
-    1..7 | foreach {
-    $f = Get-Random -Minimum 500 -Maximum 1200
-    $d = Get-Random -Minimum 90 -Maximum 125
-    [console]::Beep($f,$d)
+    #returns the new crew complement
+    [int]AddCrew([int]$Number) {
+        $this.Crew += $Number
+        return $this.Crew
     }
 
-} #close OpenCommunication
+    [timespan]GetAge() {
+        $timespan = (Get-Date).Addyears(250) - $this.ManufacturingDate
+        return $timespan
+    }
 
-#region using overloads
+    [string]GetAge([switch]$AsString) {
+        $timespan = (Get-Date).Addyears(250) - $this.ManufacturingDate
+        return $timespan.ToString()
+    }
 
-[void]Fire() {
- if ($this.Torpedos -gt 0 ) {
-     Write-Host "Fire!" -ForegroundColor Red -BackgroundColor Yellow
-     $this.Torpedos-=1
- }
- else {
-    Write-Warning "There's nothing left to fire."
- }
+    #return True or False if operation was successful
+    [Boolean]RaiseShields() {
+        if (-Not $this.shields) {
+            $this.shields = $True
+            #must use Return keyword
+            Return $True
+        }
+        else {
+            Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already up."
+            Return $False
+        }
 
-} #close first Fire method
+    } #close RaiseShields method
 
-[void]Fire([int]$Count) {
-    1..$count | foreach  {
-     if ($this.Torpedos -ge $_) {
-         Write-Host "Fire $_ !" -ForegroundColor Red -BackgroundColor Yellow
-         $this.Torpedos-=1
+    [Boolean]LowerShields() {
+        if ($this.shields) {
+            $this.shields = $False
+            Return $True
+        }
+        else {
+            Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already down."
+            Return $False
+        }
+
+    } #close RaiseShields method
+
+    [void]OpenCommunication() {
+
+        1..7 | foreach-object{
+            $f = Get-Random -Minimum 500 -Maximum 1200
+            $d = Get-Random -Minimum 90 -Maximum 125
+            [console]::Beep($f, $d)
+        }
+
+    } #close OpenCommunication
+
+    #region using overloads
+
+    [void]Fire() {
+        if ($this.Torpedos -gt 0 ) {
+            Write-Host "Fire!" -ForegroundColor Red -BackgroundColor Yellow
+            $this.Torpedos -= 1
+        }
+        else {
+            Write-Warning "There's nothing left to fire."
+        }
+
+    } #close first Fire method
+
+    #an overloaded method
+    [void]Fire([int]$Count) {
+        1..$count | foreach-object {
+            if ($this.Torpedos -ge $_) {
+                Write-Host "Fire $_" -ForegroundColor Red -BackgroundColor Yellow
+         $this.Torpedos -= 1
          Start-Sleep -Milliseconds 200
      }
      else {
@@ -144,7 +134,7 @@ hidden [datetime]$ManufacturingDate = (Get-Date).Addyears(245)
         Break
      }
     }
-} #close second Fire method
+    } #close second Fire method
 
 #endregion
 
@@ -155,34 +145,34 @@ hidden [datetime]$ManufacturingDate = (Get-Date).Addyears(245)
 #I have 2 ways of constructing an instance of this class
 MyStarship() {}
 
-MyStarShip([string]$Name,[ShipClass]$ShipClass) {
+MyStarShip([string]$Name, [ShipClass]$ShipClass) {
 
     $this.name = $Name
     $this.ShipClass = $ShipClass
     $this.Speed = "Stopped"
 
     Switch ($ShipClass) {
-    "Battlestar"  { 
+    "Battlestar" {
                     $this.CloakingDevice = [Cloak]::Present
-                    $this.Torpedos = 20 
+                    $this.Torpedos = 20
                     $this.Crew = 1000
                     }
-    "Destroyer"   { 
+    "Destroyer" {
                     $this.CloakingDevice = [Cloak]::Present
-                    $this.Torpedos = 18 
+                    $this.Torpedos = 18
                     $this.crew = 600
-                    
+
                     }
-    "Dreadnought" { 
+    "Dreadnought" {
                     $this.CloakingDevice = [Cloak]::Present
                     $this.Torpedos = 20
                     $this.crew = 900
                    }
-    "Cruiser" { 
+    "Cruiser" {
                 $this.Torpedos = 10
                 $this.crew = 200
                  }
-    "Clipper" { 
+    "Clipper" {
                 $this.Torpedos = 5
                 $this.crew = 100
                }
@@ -195,8 +185,6 @@ MyStarShip([string]$Name,[ShipClass]$ShipClass) {
 
 #endregion
 
-RETURN
-
 #region fun with the class
 
 [MyStarship]::New.OverLoadDefinitions
@@ -204,10 +192,10 @@ RETURN
 #this will use all defaults
 [MyStarship]::New()
 
-$ship = [MyStarship]::New("FSS Snover","Dreadnought")
+$ship = [MyStarship]::New("FSS Snover", "Dreadnought")
 
 #or use New-Object
-New-Object MyStarship "Galactica","Battlestar"
+New-Object MyStarship "Galactica", "Battlestar"
 
 $ship
 
@@ -237,7 +225,7 @@ $ship.fire(20)
 $ship.OpenCommunication()
 
 #hidden properties
-$ship | get-member -MemberType Properties
+$ship | Get-Member -MemberType Properties
 
 #property is there if you know it
 $ship.transponder
@@ -246,22 +234,40 @@ $ship.transponder
 $ship.GetAge()
 $ship.GetAge($True)
 
-#or build a function around the method
+#or build a function around the method and class
+
+Function New-Starship {
+    [cmdletbinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+        [alias("class")]
+        [ShipClass]$ShipClass = "Cruiser",
+        [string]$Captain
+    )
+
+    $ship = New-Object -TypeName MyStarship -ArgumentList @($Name,$ShipClass)
+    if ($Captain) {
+        $ship.Captain = $Captain
+    }
+
+    $ship
+}
+
+New-Starship -Name "Galaxy Guardian" -ShipClass Destroyer -Captain "Jason Helmick"
+
 Function Get-StarshipAge {
-[cmdletbinding()]
-Param([mystarship]$Ship)
+    [cmdletbinding()]
+    Param([mystarship]$Ship)
 
-Write-Verbose "Getting the age of $($Ship.name)"
+    Write-Verbose "Getting the age of $($Ship.name)"
 
-$ship | Select Name,ManufacturingDate,
-@{Name="Age";Expression = {$_.GetAge()}}
-
+    $ship | Select-Object Name, ManufacturingDate,@{Name="Age";Expression = {$_.GetAge()} }
 }
 
 Get-StarshipAge $ship -Verbose
 
 #hidden properties can be serialized with Export-CliXML
-
 
 #endregion
 

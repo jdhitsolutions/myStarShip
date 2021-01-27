@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Format type data generated 01/27/2021 15:15:44 by PROSPERO\Jeff
+
+This file was created using the New-PSFormatXML command that is part
+of the PSScriptTools module.
+https://github.com/jdhitsolutions/PSScriptTools
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <!--Created 01/27/2021 15:15:44 by PROSPERO\Jeff-->
+      <Name>default</Name>
+      <ViewSelectedBy>
+      <!-- using the parent class for the grouping -->
+        <TypeName>MyStarShip</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <!--
+            You can also use a scriptblock to define a custom property name.
+            You must have a Label tag.
+            <ScriptBlock>$_.machinename.toUpper()</ScriptBlock>
+            <Label>Computername</Label>
+
+            Use <Label> to set the displayed value.
+-->
+        <PropertyName>ShipClass</PropertyName>
+        <Label>ShipClass</Label>
+      </GroupBy>
+      <TableControl>
+        <!--Delete the AutoSize node if you want to use the defined widths.
+        <AutoSize />-->
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Name</Label>
+            <Width>20</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Captain</Label>
+            <Width>20</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Crew</Label>
+            <Width>7</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Torpedos</Label>
+            <Width>11</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Shields</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Speed</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <!--
+            By default the entries use property names, but you can replace them with scriptblocks.
+            <ScriptBlock>$_.foo /1mb -as [int]</ScriptBlock>
+-->
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Captain</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Crew</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Torpedos</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Shields</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Speed</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

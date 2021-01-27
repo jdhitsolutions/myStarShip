@@ -1,8 +1,7 @@
-﻿#requires -version 5.0
+﻿#requires -version 5.1
 
+Return "This is a demo script file designed to be used as a walk-through."
 #demonstrate PowerShell classes in v5 using inheritance
-
-#This is a Non-DSC resource example.
 
 #region Enums
 
@@ -15,7 +14,7 @@ Enum ShipClass {
     Cruiser
     Destroyer
     Battlestar
-    Dreadnought    
+    Dreadnought
 }
 
 Enum ShipSpeed {
@@ -36,106 +35,96 @@ Enum Cloak {
 
 Class MyStarship {
 
-#region properties
-[ValidateNotNullorEmpty()]
-[string]$Name 
+    #region properties
+    [string]$Name
+    [Shipclass]$ShipClass
+    [ShipSpeed]$Speed
+    [ValidateRange(1, 1000)]
+    [int]$Crew = 1
+    [boolean]$Shields = $False
+    [ValidateRange(0, 20)]
+    [int]$Torpedos = 0
+    [string]$Captain = $env:USERNAME
+    [Cloak]$CloakingDevice
 
-[ValidateNotNullorEmpty()]
-[Shipclass]$ShipClass 
+    #These are hidden properties
+    hidden [string]$Transponder = [guid]::NewGuid().Guid
+    hidden [datetime]$ManufacturingDate = (Get-Date).AddYears(245)
 
-[ValidateNotNullorEmpty()]
-[ShipSpeed]$Speed 
+    #endregion
 
-[ValidateRange(1,1000)]
-[int]$Crew = 1
+    #region methods
 
-[boolean]$Shields = $False
-
-[ValidateRange(0,20)]
-[int]$Torpedos = 0
-
-[string]$Captain = $env:USERNAME
-
-[Cloak]$CloakingDevice
-
-#These are hidden properties
-hidden [string]$Transponder = [guid]::NewGuid().Guid
-hidden [datetime]$ManufacturingDate = (Get-Date).AddYears(245)
-
-#endregion
-
-#region methods
-
-#returns the new crew complement
-[int]AddCrew([int]$Number) {
-    $this.Crew+= $Number
-    return $this.Crew
-}
-
-[timespan]GetAge() {
-    $timespan = (Get-Date).AddYears(250) - $this.ManufacturingDate
-    return $timespan
-}
-
-[string]GetAge([switch]$AsString) {
-    $timespan = (Get-Date).AddYears(250) - $this.ManufacturingDate
-    return $timespan.ToString()
-}
-
-#return True or False if operation was successful
-[Boolean]RaiseShields() {
- if (-Not $this.shields) {
-    $this.shields = $True
-    #must use Return keyword
-    Return $True
- }
- else {
-    Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already up."
-    Return $False
- }
-
-} #close RaiseShields method
-
-[Boolean]LowerShields() {
- if ($this.shields) {
-    $this.shields = $False
-    Return $True
- }
- else {
-    Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already down."
-    Return $False
- }
-
-} #close RaiseShields method
-
-[void]OpenCommunication () {
-
-    1..7 | foreach {
-    $f = Get-Random -Minimum 500 -Maximum 1200
-    $d = Get-Random -Minimum 90 -Maximum 125
-    [console]::Beep($f,$d)
+    #returns the new crew complement
+    [int]AddCrew([int]$Number) {
+        $this.Crew += $Number
+        return $this.Crew
     }
 
-} #close OpenCommunication
+    [timespan]GetAge() {
+        $timespan = (Get-Date).AddYears(250) - $this.ManufacturingDate
+        return $timespan
+    }
 
-#region using overloads
+    [string]GetAge([switch]$AsString) {
+        $timespan = (Get-Date).AddYears(250) - $this.ManufacturingDate
+        return $timespan.ToString()
+    }
 
-[void]Fire() {
- if ($this.Torpedos -gt 0 ) {
-     Write-Host "Fire!" -ForegroundColor Red -BackgroundColor Yellow
-     $this.Torpedos-=1
- }
- else {
-    Write-Warning "There's nothing left to fire."
- }
+    #return True or False if operation was successful
+    [Boolean]RaiseShields() {
+        if (-Not $this.shields) {
+            $this.shields = $True
+            #must use Return keyword
+            Return $True
+        }
+        else {
+            Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already up."
+            Return $False
+        }
 
-} #close first Fire method
+    } #close RaiseShields method
 
-[void]Fire([int]$Count) {
-    1..$count | foreach  {
-     if ($this.Torpedos -ge $_) {
-         Write-Host "Fire $_ !" -ForegroundColor Red -BackgroundColor Yellow
-         $this.Torpedos-=1
+    [Boolean]LowerShields() {
+        if ($this.shields) {
+            $this.shields = $False
+            Return $True
+        }
+        else {
+            Write-Warning "Are you paying attention Captain $($this.captain)? The shields are already down."
+            Return $False
+        }
+
+    } #close RaiseShields method
+
+    [void]OpenCommunication () {
+
+        1..7 | ForEach-Object {
+            $f = Get-Random -Minimum 500 -Maximum 1200
+            $d = Get-Random -Minimum 90 -Maximum 125
+            [console]::Beep($f, $d)
+        }
+
+    } #close OpenCommunication
+
+    #region using overloads
+
+    [void]Fire() {
+        if ($this.Torpedos -gt 0 ) {
+            Write-Host "Fire!" -ForegroundColor Red -BackgroundColor Yellow
+            $this.Torpedos -= 1
+        }
+        else {
+            Write-Warning "There's nothing left to fire."
+        }
+
+    } #close first Fire method
+
+    [void]Fire([int]$Count) {
+        1..$count | ForEach-Object {
+            if ($this.Torpedos -ge $_) {
+                Write-Host "Fire $_" -ForegroundColor Red -BackgroundColor Yellow
+         $this.Torpedos -= 1
          Start-Sleep -Milliseconds 200
      }
      else {
@@ -155,7 +144,7 @@ hidden [datetime]$ManufacturingDate = (Get-Date).AddYears(245)
 #I have 2 ways of constructing an instance of this class
 MyStarship() {}
 
-MyStarShip([string]$Name,[ShipClass]$ShipClass) {
+MyStarShip([string]$Name, [ShipClass]$ShipClass) {
 
     $this.Name = $Name
     $this.ShipClass = $ShipClass
@@ -168,55 +157,53 @@ MyStarShip([string]$Name,[ShipClass]$ShipClass) {
 
 #endregion
 
+#creating an inherited class
 Class Cruiser:MyStarShip {
 
-#define different property defaults
-[ShipClass]$ShipClass = [shipclass]::Cruiser
-[int]$Torpedos = 10
-[int]$Crew = 200
+    #define different property defaults
+    [ShipClass]$ShipClass = [shipclass]::Cruiser
+    [int]$Torpedos = 10
+    [int]$Crew = 200
 
-#custom constructor
-Cruiser([string]$Name) {
-    $this.name = $Name
-}
+    #custom constructor
+    Cruiser([string]$Name) {
+        $this.name = $Name
+    }
 
 }
 
 Class Dreadnought:MyStarShip {
 
-[ShipClass]$ShipClass = [shipclass]::Dreadnought
-[int]$Torpedos = 20
-[int]$Crew = 900
-[Cloak]$CloakingDevice = [cloak]::Present
+    [ShipClass]$ShipClass = [shipclass]::Dreadnought
+    [int]$Torpedos = 20
+    [int]$Crew = 900
+    [Cloak]$CloakingDevice = [cloak]::Present
 
-#add a new property
-[ValidateRange(1,100)]
-[int]$FluxCapacitor = 50
+    #add a new property
+    [ValidateRange(1, 100)]
+    [int]$FluxCapacitor = 50
 
-#add a new method
-[boolean]TestFluxCapacitor() {
- if ($this.FluxCapacitor -ge 50) {
-    Return $True
- }
- else {
-    Return $False
- }
+    #add a new method
+    [boolean]TestFluxCapacitor() {
+    if ($this.FluxCapacitor -ge 50) {
+        Return $True
+    }
+    else {
+        Return $False
+    }
+    }
+
+
+    Dreadnought([string]$Name) {
+        $this.name = $Name
+    }
+
 }
-
-
-Dreadnought([string]$Name) {
-    $this.name = $Name
-}
-
-}
-
-RETURN
 
 #region fun with the class
 
-
 #look at constructor
-[cruiser]::new
+[cruiser]::new.overloadDefinitions
 
 $a = [Cruiser]::new("Barney")
 $a
@@ -232,19 +219,22 @@ $b.TestFluxCapacitor()
 $b.fire(5)
 $b | format-table
 
-$c = [MyStarship]::new("Ad Astra","Clipper")
+$c = [MyStarship]::new("Ad Astra", "Clipper")
 $c.Captain = 'Jason'
 $c
 
-$a,$b,$c | format-table -AutoSize
+$a, $b,$c | Format-Table -AutoSize
 
 #add some type information
-Update-TypeData -TypeName MyStarship -DefaultDisplayPropertySet "Name","ShipClass","Captain","Crew","Speed"
+Update-TypeData -TypeName MyStarship -DefaultDisplayPropertySet "Name","ShipClass","Captain","Crew", "Speed"
 $c
 $a
 $a,$b,$c
 
 #You could also come up with custom format extensions. Care to try?
+#code .\starship.format.ps1xml
+Update-Formatdata .\starship.format.ps1xml
+$a, $b, $c
 
 #endregion
 
